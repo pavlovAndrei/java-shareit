@@ -104,7 +104,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private void throwIfUserDoesntExist(long id) {
-        if (!userRepository.exists(id)){
+        if (!userRepository.exists(id)) {
             throw new NotFoundException(format("User with id '%d' does not exist", id));
         }
     }
