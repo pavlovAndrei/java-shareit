@@ -21,7 +21,6 @@ import ru.practicum.shareit.item.ItemDto;
 import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.repository.UserRepository;
-import ru.practicum.shareit.user.service.UserService;
 
 @Slf4j
 @Service
