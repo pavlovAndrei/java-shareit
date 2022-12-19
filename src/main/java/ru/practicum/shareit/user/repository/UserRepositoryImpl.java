@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
+import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 
 import org.springframework.stereotype.Repository;
@@ -48,5 +50,15 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public void delete(long id) {
         users.remove(id);
+    }
+
+    @Override
+    public boolean isUserWithEmailExist(String email) {
+        return users.values().stream()
+                .anyMatch(user -> user.getEmail().equals(email));
+    }
+
+    public boolean exists(long id) {
+        return nonNull(users.get(id));
     }
 }

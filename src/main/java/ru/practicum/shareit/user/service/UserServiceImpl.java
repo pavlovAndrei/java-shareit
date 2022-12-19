@@ -71,23 +71,22 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void delete(long id) {
-        var user = getById(id);
+        if (!userRepository.exists(id)) {
+            throw new NotFoundException(format("User with id '%d' does not exist", id));
+        }
+
         userRepository.delete(id);
-        log.info("User '{}' is successfully removed", user.getName());
+        log.info("User with id '{}' is successfully removed", id);
     }
 
     private void throwIfEmailAlreadyExist(UserDto userDto) {
-        boolean isEmailAlreadyExist = userRepository.findAll()
-                .stream()
-                .anyMatch(user -> user.getEmail().equals(userDto.getEmail()));
-
-        if (isEmailAlreadyExist) {
-            throw new ConflictException(format("User with email '%s' is already exist", userDto.getEmail()));
+        if (userRepository.isUserWithEmailExist(userDto.getEmail())) {
+            throw new ConflictException(format("User with email '%s' do already exist", userDto.getEmail()));
         }
     }
 
     private User getUserById(long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(format("User with id '%d' is not exist", id)));
+                .orElseThrow(() -> new NotFoundException(format("User with id '%d' does not exist", id)));
     }
 }

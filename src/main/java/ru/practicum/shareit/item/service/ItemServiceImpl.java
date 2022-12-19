@@ -20,6 +20,7 @@ import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.item.ItemDto;
 import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.service.UserService;
 
 @Slf4j
@@ -28,12 +29,12 @@ import ru.practicum.shareit.user.service.UserService;
 public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository itemRepository;
+    private final UserRepository userRepository;
     private final ItemMapper itemMapper;
-    private final UserService userService;
 
     @Override
     public List<ItemDto> findAllByUserId(long userId) {
-        userService.getById(userId);
+        throwIfUserDoesntExist(userId);
 
         return itemRepository.findAllByUserId(userId)
                 .stream()
@@ -43,7 +44,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto getById(long itemId, long userId) {
-        userService.getById(userId);
+        throwIfUserDoesntExist(userId);
 
         var item = getItemById(itemId);
 
@@ -53,7 +54,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto add(ItemDto itemDto, long userId) {
-        userService.getById(userId);
+        throwIfUserDoesntExist(userId);
 
         var item = itemRepository.add(itemMapper.toItem(itemDto), userId);
         log.info("Item '{}' is successfully added", item.getName());
@@ -90,7 +91,7 @@ public class ItemServiceImpl implements ItemService {
             return Collections.emptyList();
         }
 
-        userService.getById(userId);
+        throwIfUserDoesntExist(userId);
 
         return itemRepository.search(searchText)
                 .stream()
@@ -100,6 +101,12 @@ public class ItemServiceImpl implements ItemService {
 
     private Item getItemById(long id) {
         return itemRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(format("Item with id '%d' is not exist", id)));
+                .orElseThrow(() -> new NotFoundException(format("Item with id '%d' does not exist", id)));
+    }
+
+    private void throwIfUserDoesntExist(long id) {
+        if (!userRepository.exists(id)){
+            throw new NotFoundException(format("User with id '%d' does not exist", id));
+        }
     }
 }

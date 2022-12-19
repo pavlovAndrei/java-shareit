@@ -15,5 +15,9 @@ public interface UserRepository {
 
     User update(long id, User user);
 
+    boolean isUserWithEmailExist(String email);
+
+    boolean exists(long id);
+
     void delete(long id);
 }
