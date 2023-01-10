@@ -20,10 +20,12 @@ import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingPostDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.State;
+import ru.practicum.shareit.booking.stratagy.BookingStateFetchStrategy;
+import ru.practicum.shareit.booking.stratagy.BookingStateFetchStrategyFactory;
 import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
@@ -41,6 +43,8 @@ public class BookingServiceImpl implements BookingService {
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
     private final BookingMapper bookingMapper;
+
+    private final BookingStateFetchStrategyFactory strategyFactory;
 
     @Override
     @Transactional
@@ -107,30 +111,8 @@ public class BookingServiceImpl implements BookingService {
         State providedState = getStateOrThrow(state);
         checkUserExists(userId);
 
-        List<Booking> bookings = new ArrayList<>();
-
-        switch (providedState) {
-            case ALL:
-                bookings = bookingRepository.findByBookerIdOrderByEndDateDesc(userId);
-                break;
-            case CURRENT:
-                bookings = bookingRepository
-                        .findByBookerIdAndStartDateLessThanEqualAndEndDateGreaterThanOrderByEndDateDesc(userId,
-                                now(), now());
-                break;
-            case FUTURE:
-                bookings = bookingRepository.findByBookerIdAndStartDateAfterOrderByEndDateDesc(userId, now());
-                break;
-            case PAST:
-                bookings = bookingRepository.findAllByBookerIdAndEndDateBeforeOrderByStartDateDesc(userId, now());
-                break;
-            case REJECTED:
-                bookings = bookingRepository.findAllByBookerIdAndStatusIsOrderByStartDateDesc(userId, REJECTED);
-                break;
-            case WAITING:
-                bookings = bookingRepository.findAllByBookerIdAndStatusIsOrderByStartDateDesc(userId, WAITING);
-                break;
-        }
+        BookingStateFetchStrategy strategy = strategyFactory.findStrategy(providedState);
+        var bookings = strategy.execute(userId);
 
         return bookings.stream()
                 .map(bookingMapper::toBookingDto)
