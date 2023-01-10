@@ -18,8 +18,13 @@ public class FutureStateStrategy implements BookingStateFetchStrategy {
     private BookingRepository bookingRepository;
 
     @Override
-    public List<Booking> execute(long userId) {
+    public List<Booking> findBookingsByBooker(long userId) {
         return bookingRepository.findByBookerIdAndStartDateAfterOrderByEndDateDesc(userId, now());
+    }
+
+    @Override
+    public List<Booking> findBookingsByOwner(long userId) {
+        return bookingRepository.findByItemOwnerIdAndStartDateAfterOrderByEndDateDesc(userId, now());
     }
 
     @Override

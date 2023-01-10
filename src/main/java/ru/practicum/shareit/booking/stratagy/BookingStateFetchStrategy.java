@@ -7,7 +7,9 @@ import ru.practicum.shareit.booking.model.State;
 
 public interface BookingStateFetchStrategy {
 
-    List<Booking> execute(long userId);
+    List<Booking> findBookingsByBooker(long userId);
+
+    List<Booking> findBookingsByOwner(long userId);
 
     State getStrategyState();
 }

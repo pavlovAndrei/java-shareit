@@ -1,10 +1,8 @@
 package ru.practicum.shareit.booking.service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.String.format;
-import static java.time.LocalDateTime.now;
 import static java.util.stream.Collectors.toList;
 
 import javax.validation.Valid;
@@ -112,7 +110,7 @@ public class BookingServiceImpl implements BookingService {
         checkUserExists(userId);
 
         BookingStateFetchStrategy strategy = strategyFactory.findStrategy(providedState);
-        var bookings = strategy.execute(userId);
+        var bookings = strategy.findBookingsByBooker(userId);
 
         return bookings.stream()
                 .map(bookingMapper::toBookingDto)
@@ -124,29 +122,9 @@ public class BookingServiceImpl implements BookingService {
         State providedState = getStateOrThrow(state);
         checkUserExists(userId);
 
-        List<Booking> bookings = new ArrayList<>();
+        BookingStateFetchStrategy strategy = strategyFactory.findStrategy(providedState);
+        var bookings = strategy.findBookingsByOwner(userId);
 
-        switch (providedState) {
-            case ALL:
-                bookings = bookingRepository.findByItemOwnerIdOrderByEndDateDesc(userId);
-                break;
-            case CURRENT:
-                bookings = bookingRepository.findByItemOwnerIdAndStartDateLessThanEqualAndEndDateGreaterThanOrderByEndDateDesc(
-                        userId, now(), now());
-                break;
-            case FUTURE:
-                bookings = bookingRepository.findByItemOwnerIdAndStartDateAfterOrderByEndDateDesc(userId, now());
-                break;
-            case PAST:
-                bookings = bookingRepository.findByItemOwnerIdAndEndDateBeforeOrderByStartDateDesc(userId, now());
-                break;
-            case REJECTED:
-                bookings = bookingRepository.findByItemOwnerIdAndStatusIsOrderByStartDateDesc(userId, REJECTED);
-                break;
-            case WAITING:
-                bookings = bookingRepository.findByItemOwnerIdAndStatusIsOrderByStartDateDesc(userId, WAITING);
-                break;
-        }
         return bookings.stream()
                 .map(bookingMapper::toBookingDto)
                 .collect(toList());

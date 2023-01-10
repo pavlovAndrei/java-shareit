@@ -16,8 +16,13 @@ public class AllStateStrategy implements BookingStateFetchStrategy {
     private BookingRepository bookingRepository;
 
     @Override
-    public List<Booking> execute(long userId) {
+    public List<Booking> findBookingsByBooker(long userId) {
         return bookingRepository.findByBookerIdOrderByEndDateDesc(userId);
+    }
+
+    @Override
+    public List<Booking> findBookingsByOwner(long userId) {
+        return bookingRepository.findByItemOwnerIdOrderByEndDateDesc(userId);
     }
 
     @Override

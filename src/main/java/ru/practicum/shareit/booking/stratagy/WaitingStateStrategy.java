@@ -18,8 +18,13 @@ public class WaitingStateStrategy implements BookingStateFetchStrategy {
     private BookingRepository bookingRepository;
 
     @Override
-    public List<Booking> execute(long userId) {
+    public List<Booking> findBookingsByBooker(long userId) {
         return bookingRepository.findAllByBookerIdAndStatusIsOrderByStartDateDesc(userId, WAITING);
+    }
+
+    @Override
+    public List<Booking> findBookingsByOwner(long userId) {
+        return bookingRepository.findByItemOwnerIdAndStatusIsOrderByStartDateDesc(userId, WAITING);
     }
 
     @Override
