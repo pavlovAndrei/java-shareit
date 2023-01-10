@@ -2,8 +2,6 @@ package ru.practicum.shareit.booking.stratagy;
 
 import java.util.List;
 
-import static java.time.LocalDateTime.now;
-
 import org.springframework.stereotype.Component;
 
 import lombok.AllArgsConstructor;

@@ -9,7 +9,6 @@ import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.State;
 
-import static ru.practicum.shareit.booking.model.Status.REJECTED;
 import static ru.practicum.shareit.booking.model.Status.WAITING;
 
 @Component
