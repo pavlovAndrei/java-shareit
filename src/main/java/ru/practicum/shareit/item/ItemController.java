@@ -3,7 +3,9 @@ package ru.practicum.shareit.item;
 import java.util.List;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,8 +17,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
+import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemGetDto;
 import ru.practicum.shareit.item.service.ItemService;
 
+@Validated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/items")
@@ -26,12 +32,12 @@ public class ItemController {
     private final ItemService itemService;
 
     @GetMapping
-    public List<ItemDto> findAllByUserId(@RequestHeader(X_SHARER_USER_ID_HEADER) long userId) {
+    public List<ItemGetDto> findAllByUserId(@RequestHeader(X_SHARER_USER_ID_HEADER) long userId) {
         return itemService.findAllByUserId(userId);
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto getById(@PathVariable long itemId,
+    public ItemGetDto getById(@PathVariable long itemId,
                            @RequestHeader(X_SHARER_USER_ID_HEADER) long userId) {
         return itemService.getById(itemId, userId);
     }
@@ -46,6 +52,13 @@ public class ItemController {
     public ItemDto add(@RequestHeader(X_SHARER_USER_ID_HEADER) long userId,
                        @RequestBody @Valid ItemDto itemDto) {
         return itemService.add(itemDto, userId);
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public CommentDto addComment(@RequestHeader(X_SHARER_USER_ID_HEADER) long userId,
+                                 @PathVariable @Positive long itemId,
+                                 @RequestBody @Valid CommentDto commentDto) {
+        return itemService.addComment(userId, itemId, commentDto);
     }
 
     @PatchMapping("/{itemId}")
