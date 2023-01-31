@@ -7,6 +7,8 @@ import static java.util.stream.Collectors.toList;
 
 import javax.validation.Valid;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -105,12 +107,15 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> findAllByBookerId(String state, long userId) {
+    public List<BookingDto> findAllByBookerId(String state, long userId,
+                                              Integer offset, Integer size) {
         State providedState = getStateOrThrow(state);
         checkUserExists(userId);
 
+        Pageable pageable = PageRequest.of(offset / size, size);
+
         BookingStateFetchStrategy strategy = strategyFactory.findStrategy(providedState);
-        var bookings = strategy.findBookingsByBooker(userId);
+        var bookings = strategy.findBookingsByBooker(userId, pageable);
 
         return bookings.stream()
                 .map(bookingMapper::toBookingDto)
@@ -118,12 +123,15 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> findAllByOwnerId(String state, long userId) {
+    public List<BookingDto> findAllByOwnerId(String state, long userId,
+                                             Integer offset, Integer size) {
         State providedState = getStateOrThrow(state);
         checkUserExists(userId);
 
+        Pageable pageable = PageRequest.of(offset / size, size);
+
         BookingStateFetchStrategy strategy = strategyFactory.findStrategy(providedState);
-        var bookings = strategy.findBookingsByOwner(userId);
+        var bookings = strategy.findBookingsByOwner(userId, pageable);
 
         return bookings.stream()
                 .map(bookingMapper::toBookingDto)

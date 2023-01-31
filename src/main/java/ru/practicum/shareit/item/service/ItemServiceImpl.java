@@ -12,6 +12,8 @@ import static java.util.stream.Collectors.toList;
 
 import javax.validation.Valid;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -53,10 +55,12 @@ public class ItemServiceImpl implements ItemService {
     private final ItemMapper itemMapper;
 
     @Override
-    public List<ItemGetDto> findAllByUserId(long userId) {
+    public List<ItemGetDto> findAllByUserId(long userId, Integer offset, Integer size) {
         throwIfUserDoesntExist(userId);
 
-        List<Item> items = itemRepository.findByOwnerIdOrderByIdAsc(userId);
+        Pageable pageable = PageRequest.of(offset / size, size);
+
+        List<Item> items = itemRepository.findByOwnerIdOrderByIdAsc(userId, pageable).getContent();
         List<ItemGetDto> foundItems = new ArrayList<>();
 
         items.forEach(item -> {
@@ -145,7 +149,10 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> search(long userId, String searchText) {
+    public List<ItemDto> search(long userId, String searchText,
+                                Integer offset, Integer size) {
+        List<Item> items;
+
         if (searchText.isBlank()) {
             log.warn("The empty search text was received for searching");
             return emptyList();
@@ -153,8 +160,10 @@ public class ItemServiceImpl implements ItemService {
 
         throwIfUserDoesntExist(userId);
 
-        return itemRepository.search(searchText)
-                .stream()
+        Pageable pageable = PageRequest.of(offset / size, size);
+        items = itemRepository.search(searchText.toLowerCase(), pageable).getContent();
+
+        return items.stream()
                 .map(itemMapper::toItemDto)
                 .collect(toList());
     }

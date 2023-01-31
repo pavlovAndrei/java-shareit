@@ -1,9 +1,9 @@
 package ru.practicum.shareit.booking.stratagy;
 
-import java.util.List;
-
 import static java.time.LocalDateTime.now;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import lombok.AllArgsConstructor;
@@ -18,13 +18,13 @@ public class PastStateStrategy implements BookingStateFetchStrategy {
     private BookingRepository bookingRepository;
 
     @Override
-    public List<Booking> findBookingsByBooker(long userId) {
-        return bookingRepository.findAllByBookerIdAndEndDateBeforeOrderByStartDateDesc(userId, now());
+    public Page<Booking> findBookingsByBooker(long userId, Pageable pageable) {
+        return bookingRepository.findAllByBookerIdAndEndDateBeforeOrderByStartDateDesc(userId, now(), pageable);
     }
 
     @Override
-    public List<Booking> findBookingsByOwner(long userId) {
-        return bookingRepository.findByItemOwnerIdAndEndDateBeforeOrderByStartDateDesc(userId, now());
+    public Page<Booking> findBookingsByOwner(long userId, Pageable pageable) {
+        return bookingRepository.findByItemOwnerIdAndEndDateBeforeOrderByStartDateDesc(userId, now(), pageable);
     }
 
     @Override

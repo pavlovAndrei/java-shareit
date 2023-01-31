@@ -1,7 +1,7 @@
 package ru.practicum.shareit.booking.stratagy;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import lombok.AllArgsConstructor;
@@ -16,13 +16,13 @@ public class AllStateStrategy implements BookingStateFetchStrategy {
     private BookingRepository bookingRepository;
 
     @Override
-    public List<Booking> findBookingsByBooker(long userId) {
-        return bookingRepository.findByBookerIdOrderByEndDateDesc(userId);
+    public Page<Booking> findBookingsByBooker(long userId, Pageable pageable) {
+        return bookingRepository.findByBookerIdOrderByEndDateDesc(userId, pageable);
     }
 
     @Override
-    public List<Booking> findBookingsByOwner(long userId) {
-        return bookingRepository.findByItemOwnerIdOrderByEndDateDesc(userId);
+    public Page<Booking> findBookingsByOwner(long userId, Pageable pageable) {
+        return bookingRepository.findByItemOwnerIdOrderByEndDateDesc(userId, pageable);
     }
 
     @Override

@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,20 +33,24 @@ public class ItemController {
     private final ItemService itemService;
 
     @GetMapping
-    public List<ItemGetDto> findAllByUserId(@RequestHeader(X_SHARER_USER_ID_HEADER) long userId) {
-        return itemService.findAllByUserId(userId);
+    public List<ItemGetDto> findAllByUserId(@RequestHeader(X_SHARER_USER_ID_HEADER) long userId,
+                                            @RequestParam(defaultValue = "0") @PositiveOrZero Integer offset,
+                                            @RequestParam(defaultValue = "10") @Positive Integer size) {
+        return itemService.findAllByUserId(userId, offset, size);
     }
 
     @GetMapping("/{itemId}")
     public ItemGetDto getById(@PathVariable long itemId,
-                           @RequestHeader(X_SHARER_USER_ID_HEADER) long userId) {
+                              @RequestHeader(X_SHARER_USER_ID_HEADER) long userId) {
         return itemService.getById(itemId, userId);
     }
 
     @GetMapping("/search")
     public List<ItemDto> search(@RequestHeader(X_SHARER_USER_ID_HEADER) long userId,
-                                @RequestParam String text) {
-        return itemService.search(userId, text);
+                                @RequestParam String text,
+                                @RequestParam(defaultValue = "0") @PositiveOrZero Integer offset,
+                                @RequestParam(defaultValue = "10") @Positive Integer size) {
+        return itemService.search(userId, text, offset, size);
     }
 
     @PostMapping
