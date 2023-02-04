@@ -71,7 +71,7 @@ class UserControllerTest {
 
     @SneakyThrows
     @Test
-    void addUser_whenInvalidEmail_thenReturnBadRequestException() {
+    void addUser_whenInvalidEmail_thenThrowBadRequestException() {
         userDto.setEmail("invalidEmail");
 
         mockMvc.perform(post("/users")

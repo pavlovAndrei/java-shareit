@@ -12,13 +12,13 @@ import static java.util.stream.Collectors.toList;
 
 import javax.validation.Valid;
 
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import lombok.RequiredArgsConstructor;
+import ru.practicum.shareit.common.CustomPageRequest;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
@@ -58,7 +58,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     public List<ItemRequestDto> getAll(long userId, Integer offset, Integer size) {
         checkUserExists(userId);
 
-        Pageable pageable = PageRequest.of(offset / size, size);
+        Pageable pageable = CustomPageRequest.of(offset, size);
 
         var itemRequestList = itemRequestRepository.findAllByRequestorIdIsNotOrderByCreatedDesc(userId, pageable).getContent();
 

@@ -76,6 +76,8 @@ class ItemRequestControllerTest {
                 .description("Request")
                 .build();
 
+        itemDto = ItemDto.builder().build();
+
         itemRequestDto = ItemRequestDto.builder()
                 .id(1L)
                 .description("Request")

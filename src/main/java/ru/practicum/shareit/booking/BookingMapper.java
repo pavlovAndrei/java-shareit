@@ -39,7 +39,7 @@ public class BookingMapper {
                 .build();
     }
 
-    public BookingDtoForItem bookingDtoForItem(Booking booking) {
+    public BookingDtoForItem toBookingDtoForItem(Booking booking) {
         return BookingDtoForItem.builder()
                 .id(booking.getId())
                 .bookerId(booking.getBooker().getId())

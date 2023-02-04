@@ -12,9 +12,7 @@ import static java.util.stream.Collectors.toList;
 
 import javax.validation.Valid;
 
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import static org.apache.commons.lang3.StringUtils.isNoneBlank;
@@ -25,6 +23,7 @@ import ru.practicum.shareit.booking.BookingMapper;
 import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.booking.dto.BookingDtoForItem;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.common.CustomPageRequest;
 import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.CommentDto;
@@ -58,7 +57,7 @@ public class ItemServiceImpl implements ItemService {
     public List<ItemGetDto> findAllByUserId(long userId, Integer offset, Integer size) {
         throwIfUserDoesntExist(userId);
 
-        Pageable pageable = PageRequest.of(offset / size, size);
+        Pageable pageable = CustomPageRequest.of(offset, size);
 
         List<Item> items = itemRepository.findByOwnerIdOrderByIdAsc(userId, pageable).getContent();
         List<ItemGetDto> foundItems = new ArrayList<>();
@@ -160,7 +159,7 @@ public class ItemServiceImpl implements ItemService {
 
         throwIfUserDoesntExist(userId);
 
-        Pageable pageable = PageRequest.of(offset / size, size);
+        Pageable pageable = CustomPageRequest.of(offset, size);
         items = itemRepository.search(searchText.toLowerCase(), pageable).getContent();
 
         return items.stream()
@@ -177,8 +176,8 @@ public class ItemServiceImpl implements ItemService {
         var item = getItemById(itemId);
 
         List<Booking> bookings =
-                bookingRepository.findAllBookingsByItemIdAndBookerIdAndEndDateBeforeAndStatus(item.getId(), userId,
-                        now(), APPROVED, Sort.by("startDate").descending());
+                bookingRepository.findAllBookingsByItemIdAndBookerIdAndEndDateBeforeAndStatusOrderByStartDateDesc(item.getId(), userId,
+                        now(), APPROVED);
 
         if (isNull(bookings) || bookings.isEmpty()) {
             throw new BadRequestException("It's prohibited to leave the comment before the expiration date");
@@ -218,7 +217,7 @@ public class ItemServiceImpl implements ItemService {
     private List<BookingDtoForItem> getBookingDtoForItemList(List<Booking> bookings) {
         return bookings.stream()
                 .filter(booking -> booking.getStatus().equals(APPROVED))
-                .map(bookingMapper::bookingDtoForItem)
+                .map(bookingMapper::toBookingDtoForItem)
                 .collect(toList());
     }
 
