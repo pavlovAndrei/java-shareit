@@ -57,8 +57,8 @@ class UserControllerTest {
     @SneakyThrows
     @Test
     void addUser() {
-        when(userService.add(userDto)).
-                thenReturn(userDto);
+        when(userService.add(userDto))
+                .thenReturn(userDto);
 
         mockMvc.perform(post("/users")
                         .content(new ObjectMapper().writeValueAsString(userDto))

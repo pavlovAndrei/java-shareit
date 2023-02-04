@@ -101,8 +101,8 @@ public class DtoJsonTest {
                 .isEqualTo(1);
         assertThat(result).extractingJsonPathStringValue("$.status")
                 .isEqualTo(Status.APPROVED.toString());
-        assertThat(result).extractingJsonPathStringValue("$.start").
-                isEqualTo("1999-09-09T09:09:09");
+        assertThat(result).extractingJsonPathStringValue("$.start")
+                .isEqualTo("1999-09-09T09:09:09");
         assertThat(result).extractingJsonPathStringValue("$.end")
                 .isEqualTo("1999-09-18T09:09:09");
 
