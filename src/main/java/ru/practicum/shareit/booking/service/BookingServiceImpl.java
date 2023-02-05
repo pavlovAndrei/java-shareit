@@ -105,12 +105,13 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> findAllByBookerId(String state, long userId) {
+    public List<BookingDto> findAllByBookerId(String state, long userId,
+                                              Integer offset, Integer size) {
         State providedState = getStateOrThrow(state);
         checkUserExists(userId);
 
         BookingStateFetchStrategy strategy = strategyFactory.findStrategy(providedState);
-        var bookings = strategy.findBookingsByBooker(userId);
+        var bookings = strategy.findBookingsByBooker(userId, offset, size);
 
         return bookings.stream()
                 .map(bookingMapper::toBookingDto)
@@ -118,12 +119,13 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> findAllByOwnerId(String state, long userId) {
+    public List<BookingDto> findAllByOwnerId(String state, long userId,
+                                             Integer offset, Integer size) {
         State providedState = getStateOrThrow(state);
         checkUserExists(userId);
 
         BookingStateFetchStrategy strategy = strategyFactory.findStrategy(providedState);
-        var bookings = strategy.findBookingsByOwner(userId);
+        var bookings = strategy.findBookingsByOwner(userId, offset, size);
 
         return bookings.stream()
                 .map(bookingMapper::toBookingDto)

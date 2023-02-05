@@ -8,7 +8,7 @@ import ru.practicum.shareit.item.dto.ItemGetDto;
 
 public interface ItemService {
 
-    List<ItemGetDto> findAllByUserId(long userId);
+    List<ItemGetDto> findAllByUserId(long userId, Integer offset, Integer size);
 
     ItemGetDto getById(long itemId, long userId);
 
@@ -16,7 +16,7 @@ public interface ItemService {
 
     ItemDto update(ItemDto itemDto, long itemId, long userId);
 
-    List<ItemDto> search(long userId, String searchText);
+    List<ItemDto> search(long userId, String searchText, Integer offset, Integer size);
 
     CommentDto addComment(long userId, long itemId, CommentDto commentDto);
 }

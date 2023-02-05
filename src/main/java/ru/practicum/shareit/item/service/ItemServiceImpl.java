@@ -12,7 +12,7 @@ import static java.util.stream.Collectors.toList;
 
 import javax.validation.Valid;
 
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import static org.apache.commons.lang3.StringUtils.isNoneBlank;
@@ -23,6 +23,7 @@ import ru.practicum.shareit.booking.BookingMapper;
 import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.booking.dto.BookingDtoForItem;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.common.CustomPageRequest;
 import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.CommentDto;
@@ -53,10 +54,12 @@ public class ItemServiceImpl implements ItemService {
     private final ItemMapper itemMapper;
 
     @Override
-    public List<ItemGetDto> findAllByUserId(long userId) {
+    public List<ItemGetDto> findAllByUserId(long userId, Integer offset, Integer size) {
         throwIfUserDoesntExist(userId);
 
-        List<Item> items = itemRepository.findByOwnerIdOrderByIdAsc(userId);
+        Pageable pageable = CustomPageRequest.of(offset, size);
+
+        List<Item> items = itemRepository.findByOwnerIdOrderByIdAsc(userId, pageable).getContent();
         List<ItemGetDto> foundItems = new ArrayList<>();
 
         items.forEach(item -> {
@@ -145,7 +148,10 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> search(long userId, String searchText) {
+    public List<ItemDto> search(long userId, String searchText,
+                                Integer offset, Integer size) {
+        List<Item> items;
+
         if (searchText.isBlank()) {
             log.warn("The empty search text was received for searching");
             return emptyList();
@@ -153,8 +159,10 @@ public class ItemServiceImpl implements ItemService {
 
         throwIfUserDoesntExist(userId);
 
-        return itemRepository.search(searchText)
-                .stream()
+        Pageable pageable = CustomPageRequest.of(offset, size);
+        items = itemRepository.search(searchText.toLowerCase(), pageable).getContent();
+
+        return items.stream()
                 .map(itemMapper::toItemDto)
                 .collect(toList());
     }
@@ -168,8 +176,8 @@ public class ItemServiceImpl implements ItemService {
         var item = getItemById(itemId);
 
         List<Booking> bookings =
-                bookingRepository.findAllBookingsByItemIdAndBookerIdAndEndDateBeforeAndStatus(item.getId(), userId,
-                        now(), APPROVED, Sort.by("startDate").descending());
+                bookingRepository.findAllBookingsByItemIdAndBookerIdAndEndDateBeforeAndStatusOrderByStartDateDesc(item.getId(), userId,
+                        now(), APPROVED);
 
         if (isNull(bookings) || bookings.isEmpty()) {
             throw new BadRequestException("It's prohibited to leave the comment before the expiration date");
@@ -209,7 +217,7 @@ public class ItemServiceImpl implements ItemService {
     private List<BookingDtoForItem> getBookingDtoForItemList(List<Booking> bookings) {
         return bookings.stream()
                 .filter(booking -> booking.getStatus().equals(APPROVED))
-                .map(bookingMapper::bookingDtoForItem)
+                .map(bookingMapper::toBookingDtoForItem)
                 .collect(toList());
     }
 

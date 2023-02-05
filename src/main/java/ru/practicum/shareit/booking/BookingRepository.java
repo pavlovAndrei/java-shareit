@@ -3,7 +3,8 @@ package ru.practicum.shareit.booking;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import ru.practicum.shareit.booking.model.Booking;
@@ -11,35 +12,41 @@ import ru.practicum.shareit.booking.model.Status;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
-    List<Booking> findByBookerIdOrderByEndDateDesc(long userId);
+    Page<Booking> findByBookerId(long userId, Pageable pageable);
 
-    List<Booking> findAllByBookerIdAndEndDateBeforeOrderByStartDateDesc(long userId, LocalDateTime currentDateTime);
+    Page<Booking> findAllByBookerIdAndEndDateBefore(long userId, LocalDateTime currentDateTime,
+                                                    Pageable pageable);
 
-    List<Booking> findByBookerIdAndStartDateAfterOrderByEndDateDesc(long userId, LocalDateTime currentDateTime);
+    Page<Booking> findByBookerIdAndStartDateAfter(long userId, LocalDateTime currentDateTime,
+                                                  Pageable pageable);
 
-    List<Booking> findAllByBookerIdAndStatusIsOrderByStartDateDesc(long userId, Status status);
+    Page<Booking> findAllByBookerIdAndStatusIs(long userId, Status status,
+                                               Pageable pageable);
 
-    List<Booking> findByBookerIdAndStartDateLessThanEqualAndEndDateGreaterThanOrderByEndDateDesc(long userId,
-                                                                                                 LocalDateTime currentDateTimeOne,
-                                                                                                 LocalDateTime currentDateTimeTwo);
+    Page<Booking> findByBookerIdAndStartDateLessThanEqualAndEndDateGreaterThan(long userId,
+                                                                               LocalDateTime currentDateTimeOne,
+                                                                               LocalDateTime currentDateTimeTwo,
+                                                                               Pageable pageable);
 
-    List<Booking> findByItemOwnerIdOrderByEndDateDesc(long userId);
+    Page<Booking> findByItemOwnerId(long userId, Pageable pageable);
 
-    List<Booking> findByItemOwnerIdAndEndDateBeforeOrderByStartDateDesc(long userId, LocalDateTime currentDateTime);
+    Page<Booking> findByItemOwnerIdAndEndDateBefore(long userId, LocalDateTime currentDateTime,
+                                                    Pageable pageable);
 
-    List<Booking> findByItemOwnerIdAndStartDateAfterOrderByEndDateDesc(long userId, LocalDateTime currentDateTime);
+    Page<Booking> findByItemOwnerIdAndStartDateAfter(long userId, LocalDateTime currentDateTime,
+                                                     Pageable pageable);
 
-    List<Booking> findByItemOwnerIdAndStatusIsOrderByStartDateDesc(long userId, Status status);
+    Page<Booking> findByItemOwnerIdAndStatusIs(long userId, Status status, Pageable pageable);
 
-    List<Booking> findByItemOwnerIdAndStartDateLessThanEqualAndEndDateGreaterThanOrderByEndDateDesc(long userId,
-                                                                                                    LocalDateTime currentDateTimeOne,
-                                                                                                    LocalDateTime currentDateTimeTwo);
+    Page<Booking> findByItemOwnerIdAndStartDateLessThanEqualAndEndDateGreaterThan(long userId,
+                                                                                  LocalDateTime currentDateTimeOne,
+                                                                                  LocalDateTime currentDateTimeTwo,
+                                                                                  Pageable pageable);
 
     List<Booking> findAllByItemIdAndStartDateIsAfterOrderByStartDateDesc(long itemId, LocalDateTime currentDateTime);
 
     List<Booking> findAllByItemIdAndEndDateIsBeforeOrderByEndDateDesc(long itemId, LocalDateTime currentDateTime);
 
-    List<Booking> findAllBookingsByItemIdAndBookerIdAndEndDateBeforeAndStatus(Long itemId, Long userId,
-                                                                              LocalDateTime now, Status status,
-                                                                              Sort sort);
+    List<Booking> findAllBookingsByItemIdAndBookerIdAndEndDateBeforeAndStatusOrderByStartDateDesc(Long itemId, Long userId,
+                                                                                                  LocalDateTime now, Status status);
 }

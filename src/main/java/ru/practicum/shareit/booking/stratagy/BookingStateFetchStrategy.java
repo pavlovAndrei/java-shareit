@@ -1,15 +1,18 @@
 package ru.practicum.shareit.booking.stratagy;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.State;
 
 public interface BookingStateFetchStrategy {
 
-    List<Booking> findBookingsByBooker(long userId);
+    Page<Booking> findBookingsByBooker(long userId, Integer offset, Integer size);
 
-    List<Booking> findBookingsByOwner(long userId);
+    Page<Booking> findBookingsByOwner(long userId, Integer offset, Integer size);
 
     State getStrategyState();
+
+    Pageable getStrategyPageable(Integer offset, Integer size);
 }
