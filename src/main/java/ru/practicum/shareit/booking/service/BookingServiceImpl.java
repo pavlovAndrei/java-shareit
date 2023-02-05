@@ -7,7 +7,6 @@ import static java.util.stream.Collectors.toList;
 
 import javax.validation.Valid;
 
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -21,7 +20,6 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.State;
 import ru.practicum.shareit.booking.stratagy.BookingStateFetchStrategy;
 import ru.practicum.shareit.booking.stratagy.BookingStateFetchStrategyFactory;
-import ru.practicum.shareit.common.CustomPageRequest;
 import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.model.Item;
@@ -112,10 +110,8 @@ public class BookingServiceImpl implements BookingService {
         State providedState = getStateOrThrow(state);
         checkUserExists(userId);
 
-        Pageable pageable = CustomPageRequest.of(offset, size);
-
         BookingStateFetchStrategy strategy = strategyFactory.findStrategy(providedState);
-        var bookings = strategy.findBookingsByBooker(userId, pageable);
+        var bookings = strategy.findBookingsByBooker(userId, offset, size);
 
         return bookings.stream()
                 .map(bookingMapper::toBookingDto)
@@ -128,10 +124,8 @@ public class BookingServiceImpl implements BookingService {
         State providedState = getStateOrThrow(state);
         checkUserExists(userId);
 
-        Pageable pageable = CustomPageRequest.of(offset, size);
-
         BookingStateFetchStrategy strategy = strategyFactory.findStrategy(providedState);
-        var bookings = strategy.findBookingsByOwner(userId, pageable);
+        var bookings = strategy.findBookingsByOwner(userId, offset, size);
 
         return bookings.stream()
                 .map(bookingMapper::toBookingDto)

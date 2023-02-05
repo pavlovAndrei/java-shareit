@@ -26,7 +26,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import lombok.SneakyThrows;
 import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.service.UserService;
@@ -54,9 +53,8 @@ class UserControllerTest {
                 .build();
     }
 
-    @SneakyThrows
     @Test
-    void addUser() {
+    void addUser() throws Exception {
         when(userService.add(userDto))
                 .thenReturn(userDto);
 
@@ -69,9 +67,8 @@ class UserControllerTest {
                 .andExpect((jsonPath("$.email").value(userDto.getEmail())));
     }
 
-    @SneakyThrows
     @Test
-    void addUser_whenInvalidEmail_thenThrowBadRequestException() {
+    void addUser_whenInvalidEmail_thenThrowBadRequestException() throws Exception {
         userDto.setEmail("invalidEmail");
 
         mockMvc.perform(post("/users")
@@ -80,9 +77,8 @@ class UserControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
-    @SneakyThrows
     @Test
-    void getAllUsers() {
+    void getAllUsers() throws Exception {
         when(userService.findAll())
                 .thenReturn(List.of(userDto));
 
@@ -91,18 +87,16 @@ class UserControllerTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(List.of(userDto))));
     }
 
-    @SneakyThrows
     @Test
-    void deleteUserById() {
+    void deleteUserById() throws Exception {
         mockMvc.perform(delete("/users/{id}", userDto.getId()))
                 .andExpect(status().isOk());
 
         verify(userService, times(1)).delete(userDto.getId());
     }
 
-    @SneakyThrows
     @Test
-    void getUserById() {
+    void getUserById() throws Exception {
         when(userService.getById(userDto.getId()))
                 .thenReturn(userDto);
 
@@ -114,9 +108,8 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.name").value((userDto.getName())));
     }
 
-    @SneakyThrows
     @Test
-    void getUserById_whenUserNotFound_thenThrowNotFoundException() {
+    void getUserById_whenUserNotFound_thenThrowNotFoundException() throws Exception {
         var wrongUserId = "222";
 
         when(userService.getById(anyLong()))
@@ -126,9 +119,8 @@ class UserControllerTest {
                 .andExpect(status().isNotFound());
     }
 
-    @SneakyThrows
     @Test
-    void updateUser() {
+    void updateUser() throws Exception {
         when(userService.update(userDto.getId(), userDto))
                 .thenReturn(userDto);
 
@@ -141,9 +133,8 @@ class UserControllerTest {
                 .andExpect((jsonPath("$.email").value(userDto.getEmail())));
     }
 
-    @SneakyThrows
     @Test
-    void updateUser_whenUserNotExist_thenThrowBadRequestException() {
+    void updateUser_whenUserNotExist_thenThrowBadRequestException() throws Exception {
         when(userService.update(anyLong(), any()))
                 .thenThrow(BadRequestException.class);
 

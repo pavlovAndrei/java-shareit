@@ -26,7 +26,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import lombok.SneakyThrows;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingPostDto;
 import ru.practicum.shareit.booking.model.State;
@@ -94,9 +93,9 @@ class BookingControllerTest {
 
     }
 
-    @SneakyThrows
+
     @Test
-    void addBooking() {
+    void addBooking() throws Exception {
         BookingPostDto bookingPostDto = BookingPostDto.builder()
                 .start(bookingDtoNew.getStart())
                 .itemId(item.getId())
@@ -118,9 +117,8 @@ class BookingControllerTest {
         assertEquals(objectMapper.writeValueAsString(bookingDtoNew), result);
     }
 
-    @SneakyThrows
     @Test
-    void approveBooking() {
+    void approveBooking() throws Exception {
         bookingDtoNew.setStatus(Status.APPROVED);
 
         when(bookingService.approveOrReject(anyLong(), anyBoolean(), anyLong()))
@@ -138,9 +136,8 @@ class BookingControllerTest {
         assertEquals(objectMapper.writeValueAsString(bookingDtoNew), result);
     }
 
-    @SneakyThrows
     @Test
-    void getBookingById() {
+    void getBookingById() throws Exception {
         when(bookingService.getById(anyLong(), anyLong()))
                 .thenReturn(bookingDtoNew);
 
@@ -151,9 +148,9 @@ class BookingControllerTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(bookingDtoNew)));
     }
 
-    @SneakyThrows
+
     @Test
-    void getAllBookingsByBookerId() {
+    void getAllBookingsByBookerId() throws Exception {
         when(bookingService.findAllByBookerId(any(), anyLong(), anyInt(), anyInt()))
                 .thenReturn(List.of(bookingDtoNew));
 
@@ -167,9 +164,9 @@ class BookingControllerTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(List.of(bookingDtoNew))));
     }
 
-    @SneakyThrows
+
     @Test
-    void getAllBookingsByBookerId_whenInvalidState_thenThrowBadRequestException() {
+    void getAllBookingsByBookerId_whenInvalidState_thenThrowBadRequestException() throws Exception {
         var invalidState = "INVALID_STATE";
 
         when(bookingService.findAllByBookerId(any(), anyLong(), anyInt(), anyInt()))
@@ -197,9 +194,8 @@ class BookingControllerTest {
                 .andExpect(status().isInternalServerError());
     }
 
-    @SneakyThrows
     @Test
-    void getAllBookingsByBookerId_whenNegativeSize_thenThrowServerErrorException() {
+    void getAllBookingsByBookerId_whenNegativeSize_thenThrowServerErrorException() throws Exception {
         var negativeSize = "-1";
 
         mockMvc.perform(get("/bookings")
@@ -211,9 +207,8 @@ class BookingControllerTest {
                 .andExpect(status().isInternalServerError());
     }
 
-    @SneakyThrows
     @Test
-    void getAllBookingsByOwnerId() {
+    void getAllBookingsByOwnerId() throws Exception {
         when(bookingService.findAllByOwnerId(any(), anyLong(), anyInt(), anyInt()))
                 .thenReturn(List.of(bookingDtoNew));
 
@@ -227,9 +222,8 @@ class BookingControllerTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(List.of(bookingDtoNew))));
     }
 
-    @SneakyThrows
     @Test
-    void getAllBookingsByOwnerId_whenNegativePositive_thenThrowServerErrorException() {
+    void getAllBookingsByOwnerId_whenNegativePositive_thenThrowServerErrorException() throws Exception {
         var negativeFrom = "-1";
 
         mockMvc.perform(get("/bookings/owner")
@@ -241,9 +235,8 @@ class BookingControllerTest {
                 .andExpect(status().isInternalServerError());
     }
 
-    @SneakyThrows
     @Test
-    void getAllBookingsByOwnerId_whenNegativeSize_thenThrowServerErrorException() {
+    void getAllBookingsByOwnerId_whenNegativeSize_thenThrowServerErrorException() throws Exception {
         var negativeSize = "-1";
 
         mockMvc.perform(get("/bookings/owner")

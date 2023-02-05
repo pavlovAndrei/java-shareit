@@ -16,15 +16,17 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.Pageable;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.data.domain.Sort.Direction.DESC;
 
 import lombok.RequiredArgsConstructor;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
-import ru.practicum.shareit.common.CustomPageRequest;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.repository.UserRepository;
+
+import static ru.practicum.shareit.common.CustomPageRequest.of;
 
 @AutoConfigureTestDatabase
 @DataJpaTest
@@ -51,7 +53,6 @@ public class BookingRepositoryTest {
 
     private final DateTimeFormatter formatter = ofPattern("yyyy-MM-dd:HH-mm");
     private final LocalDateTime localDateTimeNow = parse(LocalDateTime.now().format(formatter), formatter);
-    private final Pageable defaultPageable = CustomPageRequest.of(0, 10);
 
     @BeforeEach
     void setUp() {
@@ -142,8 +143,9 @@ public class BookingRepositoryTest {
 
     @Test
     void findByBookerIdOrderByEndDateDesc() {
-        var actualList = bookingRepository.findByBookerIdOrderByEndDateDesc(bookerOne.getId(),
-                CustomPageRequest.of(1, 2)).getContent();
+        Pageable pageable = of(1, 2, DESC, "endDate");
+
+        var actualList = bookingRepository.findByBookerId(bookerOne.getId(), pageable).getContent();
 
         var expectedList = List.of(bookingInFutureAndWaitingAndEndDateInFifteenDays,
                 bookingInFutureAndApprovedAndEndDateInSevenDays);
@@ -153,9 +155,10 @@ public class BookingRepositoryTest {
 
     @Test
     void findAllByBookerIdAndEndDateBeforeOrderByStartDateDesc() {
-        var actualList = bookingRepository
-                .findAllByBookerIdAndEndDateBeforeOrderByStartDateDesc(bookerOne.getId(),
-                        LocalDateTime.now(), defaultPageable).getContent();
+        Pageable pageable = of(0, 10, DESC, "startDate");
+
+        var actualList = bookingRepository.findAllByBookerIdAndEndDateBefore(bookerOne.getId(),
+                LocalDateTime.now(), pageable).getContent();
 
         var expectedList = List.of(bookingInPastAndApprovedAndEndDateFiveDaysBefore,
                 bookingInPastAndRejectedAndEndDateThreeDaysBefore);
@@ -165,9 +168,10 @@ public class BookingRepositoryTest {
 
     @Test
     void findByBookerIdAndStartDateAfterOrderByEndDateDesc() {
-        var actualList = bookingRepository
-                .findByBookerIdAndStartDateAfterOrderByEndDateDesc(bookerOne.getId(),
-                        LocalDateTime.now(), defaultPageable).getContent();
+        Pageable pageable = of(0, 10, DESC, "endDate");
+
+        var actualList = bookingRepository.findByBookerIdAndStartDateAfter(bookerOne.getId(),
+                LocalDateTime.now(), pageable).getContent();
 
         var expectedList = List.of(bookingInFutureAndWaitingAndEndDateInFifteenDays,
                 bookingInFutureAndApprovedAndEndDateInSevenDays);
@@ -177,18 +181,21 @@ public class BookingRepositoryTest {
 
     @Test
     void findAllByBookerIdAndStatusIsOrderByStartDateDesc() {
-        var actualList = bookingRepository
-                .findAllByBookerIdAndStatusIsOrderByStartDateDesc(bookerOne.getId(),
-                        Status.WAITING, defaultPageable).getContent();
+        Pageable pageable = of(0, 10, DESC, "startDate");
+
+        var actualList = bookingRepository.findAllByBookerIdAndStatusIs(bookerOne.getId(),
+                Status.WAITING, pageable).getContent();
 
         assertThat(actualList).isEqualTo(List.of(bookingInFutureAndWaitingAndEndDateInFifteenDays));
     }
 
     @Test
     void findByBookerIdAndStartDateLessThanEqualAndEndDateGreaterThanOrderByEndDateDesc() {
+        Pageable pageable = of(0, 10, DESC, "endDate");
+
         var actualList = bookingRepository
-                .findByBookerIdAndStartDateLessThanEqualAndEndDateGreaterThanOrderByEndDateDesc(bookerOne.getId(),
-                        localDateTimeNow.minusDays(2), localDateTimeNow.minusDays(5), defaultPageable).getContent();
+                .findByBookerIdAndStartDateLessThanEqualAndEndDateGreaterThan(bookerOne.getId(),
+                        localDateTimeNow.minusDays(2), localDateTimeNow.minusDays(5), pageable).getContent();
 
         var expectedList = List.of(bookingInCurrentAndApprovedAndEndDateInFiveDays,
                 bookingInPastAndRejectedAndEndDateThreeDaysBefore);
@@ -198,8 +205,10 @@ public class BookingRepositoryTest {
 
     @Test
     void findByItemOwnerIdOrderByEndDateDesc() {
-        var actualList = bookingRepository.findByItemOwnerIdOrderByEndDateDesc(owner.getId(),
-                CustomPageRequest.of(1, 2)).getContent();
+        Pageable pageable = of(1, 2, DESC, "endDate");
+
+        var actualList = bookingRepository.findByItemOwnerId(owner.getId(),
+                pageable).getContent();
 
         var expectedList = List.of(bookingInFutureAndWaitingAndEndDateInFifteenDays,
                 bookingByBookerTwoInFutureAndWaitingAndEndDateInTenDays);
@@ -209,9 +218,10 @@ public class BookingRepositoryTest {
 
     @Test
     void findByItemOwnerIdAndEndDateBeforeOrderByStartDateDesc() {
-        var actualList = bookingRepository
-                .findByItemOwnerIdAndEndDateBeforeOrderByStartDateDesc(owner.getId(),
-                        localDateTimeNow.minusDays(2), defaultPageable).getContent();
+        Pageable pageable = of(0, 10, DESC, "startDate");
+
+        var actualList = bookingRepository.findByItemOwnerIdAndEndDateBefore(owner.getId(),
+                localDateTimeNow.minusDays(2), pageable).getContent();
 
         var expectedList = List.of(bookingInPastAndApprovedAndEndDateFiveDaysBefore,
                 bookingInPastAndRejectedAndEndDateThreeDaysBefore);
@@ -221,18 +231,20 @@ public class BookingRepositoryTest {
 
     @Test
     void findByItemOwnerIdAndStartDateAfterOrderByEndDateDesc() {
-        var actualList = bookingRepository
-                .findByItemOwnerIdAndStartDateAfterOrderByEndDateDesc(owner.getId(),
-                        localDateTimeNow.plusDays(2), defaultPageable).getContent();
+        Pageable pageable = of(0, 10, DESC, "endDate");
+
+        var actualList = bookingRepository.findByItemOwnerIdAndStartDateAfter(owner.getId(),
+                localDateTimeNow.plusDays(2), pageable).getContent();
 
         assertThat(actualList).isEqualTo(List.of(bookingInFutureAndWaitingAndEndDateInFifteenDays));
     }
 
     @Test
     void findByItemOwnerIdAndStatusIsOrderByStartDateDesc() {
-        var actualList = bookingRepository
-                .findByItemOwnerIdAndStatusIsOrderByStartDateDesc(owner.getId(),
-                        Status.WAITING, defaultPageable).getContent();
+        Pageable pageable = of(0, 10, DESC, "startDate");
+
+        var actualList = bookingRepository.findByItemOwnerIdAndStatusIs(owner.getId(),
+                Status.WAITING, pageable).getContent();
 
         var expectedList = List.of(bookingInFutureAndWaitingAndEndDateInFifteenDays,
                 bookingByBookerTwoInFutureAndWaitingAndEndDateInTenDays);
@@ -242,9 +254,11 @@ public class BookingRepositoryTest {
 
     @Test
     void findByItemOwnerIdAndStartDateLessThanEqualAndEndDateGreaterThanOrderByEndDateDesc() {
+        Pageable pageable = of(0, 10, DESC, "endDate");
+
         var actualList = bookingRepository
-                .findByItemOwnerIdAndStartDateLessThanEqualAndEndDateGreaterThanOrderByEndDateDesc(owner.getId(),
-                        localDateTimeNow.minusDays(3), localDateTimeNow.minusDays(6), defaultPageable).getContent();
+                .findByItemOwnerIdAndStartDateLessThanEqualAndEndDateGreaterThan(owner.getId(),
+                        localDateTimeNow.minusDays(3), localDateTimeNow.minusDays(6), pageable).getContent();
 
         var expectedList = List.of(bookingInPastAndRejectedAndEndDateThreeDaysBefore,
                 bookingInPastAndApprovedAndEndDateFiveDaysBefore);

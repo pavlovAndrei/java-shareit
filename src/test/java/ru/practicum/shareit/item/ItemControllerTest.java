@@ -26,7 +26,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import lombok.SneakyThrows;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -88,9 +87,8 @@ class ItemControllerTest {
         itemGetDto = itemMapper.toItemGetDto(item);
     }
 
-    @SneakyThrows
     @Test
-    void addItem() {
+    void addItem() throws Exception {
         when(itemService.add(any(), anyLong()))
                 .thenReturn(itemDto);
 
@@ -107,9 +105,9 @@ class ItemControllerTest {
                 .andExpect(jsonPath("$.requestId").value(itemDto.getRequestId()));
     }
 
-    @SneakyThrows
+
     @Test
-    void addItem_whenInvalidItem_thenThrowBadRequestException() {
+    void addItem_whenInvalidItem_thenThrowBadRequestException() throws Exception {
         itemDto.setAvailable(null);
 
         mockMvc.perform(post("/items")
@@ -119,9 +117,8 @@ class ItemControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
-    @SneakyThrows
     @Test
-    void getAllItemsByUserId() {
+    void getAllItemsByUserId() throws Exception {
         when(itemService.findAllByUserId(anyLong(), anyInt(), anyInt()))
                 .thenReturn(List.of(itemGetDto));
 
@@ -133,9 +130,8 @@ class ItemControllerTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(List.of(itemGetDto))));
     }
 
-    @SneakyThrows
     @Test
-    void getItemById() {
+    void getItemById() throws Exception {
         when(itemService.getById(anyLong(), anyLong()))
                 .thenReturn(itemGetDto);
 
@@ -148,9 +144,8 @@ class ItemControllerTest {
                 .andExpect(jsonPath("$.available").value(itemDto.getAvailable()));
     }
 
-    @SneakyThrows
     @Test
-    void searchItem() {
+    void searchItem() throws Exception {
         when(itemService.search(anyLong(), anyString(), anyInt(), anyInt()))
                 .thenReturn(List.of(itemDto));
 
@@ -163,9 +158,8 @@ class ItemControllerTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(List.of(itemDto))));
     }
 
-    @SneakyThrows
     @Test
-    void updateItem() {
+    void updateItem() throws Exception {
         var itemForUpdate = itemDto;
         itemForUpdate.setName("Updated name");
 
@@ -183,9 +177,8 @@ class ItemControllerTest {
                 .andExpect(jsonPath("$.available").value(itemDto.getAvailable()));
     }
 
-    @SneakyThrows
     @Test
-    void updateItem_whenUserIsNotOwner_thenThrowNotFoundException() {
+    void updateItem_whenUserIsNotOwner_thenThrowNotFoundException() throws Exception {
         var incorrectOwnerId = "222";
 
         when(itemService.update(any(), anyLong(), anyLong()))
@@ -199,9 +192,8 @@ class ItemControllerTest {
                 .andExpect(status().isNotFound());
     }
 
-    @SneakyThrows
     @Test
-    void createComment() {
+    void createComment() throws Exception {
         when(itemService.addComment(anyLong(), anyLong(), any()))
                 .thenReturn(commentDto);
 
@@ -213,9 +205,8 @@ class ItemControllerTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(commentDto)));
     }
 
-    @SneakyThrows
     @Test
-    void createComment_whenEmptyText_thenThrowException() {
+    void createComment_whenEmptyText_thenThrowException() throws Exception {
         commentDto.setText("");
 
         when(itemService.addComment(anyLong(), anyLong(), any()))

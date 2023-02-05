@@ -29,7 +29,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import lombok.SneakyThrows;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestPostDto;
@@ -87,9 +86,8 @@ class ItemRequestControllerTest {
                 .build();
     }
 
-    @SneakyThrows
     @Test
-    void createRequest() {
+    void createRequest() throws Exception {
         when(itemRequestService.add(anyLong(), any()))
                 .thenReturn(itemRequestDto);
 
@@ -104,9 +102,8 @@ class ItemRequestControllerTest {
                 .andExpect(jsonPath("$.created").isNotEmpty());
     }
 
-    @SneakyThrows
     @Test
-    void createRequest_whenEmptyDescription_thenThrowBadRequestException() {
+    void createRequest_whenEmptyDescription_thenThrowBadRequestException() throws Exception {
         itemRequestPostDto.setDescription(null);
 
         mockMvc.perform(post("/requests")
@@ -118,9 +115,8 @@ class ItemRequestControllerTest {
         verify(itemRequestService, never()).add(anyLong(), any());
     }
 
-    @SneakyThrows
     @Test
-    void getAllItemRequestsByOwnerId() {
+    void getAllItemRequestsByOwnerId() throws Exception {
         when(itemRequestService.findAllByOwnerId(anyLong()))
                 .thenReturn(List.of(itemRequestDto));
 
@@ -134,9 +130,8 @@ class ItemRequestControllerTest {
                 .findAllByOwnerId(owner.getId());
     }
 
-    @SneakyThrows
     @Test
-    void getAllItemRequests() {
+    void getAllItemRequests() throws Exception {
         when(itemRequestService.getAll(anyLong(), anyInt(), anyInt()))
                 .thenReturn(List.of(itemRequestDto));
 
@@ -152,9 +147,8 @@ class ItemRequestControllerTest {
                 .getAll(user.getId(), 0, 10);
     }
 
-    @SneakyThrows
     @Test
-    void getAllRequests_whenNegativeFrom_thenThrowServerErrorException() {
+    void getAllRequests_whenNegativeFrom_thenThrowServerErrorException() throws Exception {
         var negativeFrom = -1;
 
         mockMvc.perform(get("/requests/all")
@@ -167,9 +161,8 @@ class ItemRequestControllerTest {
                 .getAll(user.getId(), negativeFrom, 10);
     }
 
-    @SneakyThrows
     @Test
-    void getAllRequests_whenNegativeSize_thenThrowServerErrorException() {
+    void getAllRequests_whenNegativeSize_thenThrowServerErrorException() throws Exception {
         var negativeSize = -1;
 
         when(itemRequestService.getAll(anyLong(), anyInt(), anyInt()))
@@ -184,9 +177,8 @@ class ItemRequestControllerTest {
         verify(itemRequestService, never()).getAll(user.getId(), 0, negativeSize);
     }
 
-    @SneakyThrows
     @Test
-    void getRequestById() {
+    void getRequestById() throws Exception {
         when(itemRequestService.getById(anyLong(), anyLong()))
                 .thenReturn(itemRequestDto);
 

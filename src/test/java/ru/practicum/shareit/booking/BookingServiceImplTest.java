@@ -12,7 +12,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -21,6 +20,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.data.domain.Sort.Direction.DESC;
 
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingPostDto;
@@ -31,7 +31,6 @@ import ru.practicum.shareit.booking.service.BookingServiceImpl;
 import ru.practicum.shareit.booking.stratagy.AllStateStrategy;
 import ru.practicum.shareit.booking.stratagy.BookingStateFetchStrategyFactory;
 import ru.practicum.shareit.booking.stratagy.WaitingStateStrategy;
-import ru.practicum.shareit.common.CustomPageRequest;
 import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -42,6 +41,7 @@ import ru.practicum.shareit.user.UserDto;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import static ru.practicum.shareit.booking.model.Status.WAITING;
+import static ru.practicum.shareit.common.CustomPageRequest.of;
 
 @ExtendWith(MockitoExtension.class)
 public class BookingServiceImplTest {
@@ -61,7 +61,6 @@ public class BookingServiceImplTest {
 
     private final Integer from = 0;
     private final Integer size = 10;
-    private final Pageable defaultPageable = CustomPageRequest.of(0, 10);
 
     @Test
     void addBooking() {
@@ -352,7 +351,7 @@ public class BookingServiceImplTest {
 
         when(userRepository.existsById(anyLong()))
                 .thenReturn(true);
-        when(bookingRepository.findByBookerIdOrderByEndDateDesc(userId, defaultPageable))
+        when(bookingRepository.findByBookerId(userId, of(0, 10, DESC, "endDate")))
                 .thenReturn(Page.empty());
         when(strategyFactory.findStrategy(any()))
                 .thenReturn(new AllStateStrategy(bookingRepository));
@@ -366,12 +365,14 @@ public class BookingServiceImplTest {
 
     @Test
     void getAllByOwnerId_whenStateIsFuture() {
+
         String state = State.FUTURE.name();
         long userId = 1L;
 
         when(userRepository.existsById(anyLong()))
                 .thenReturn(true);
-        when(bookingRepository.findByItemOwnerIdAndStatusIsOrderByStartDateDesc(userId, WAITING, defaultPageable))
+        when(bookingRepository.findByItemOwnerIdAndStatusIs(userId,
+                WAITING, of(0, 10, DESC, "startDate")))
                 .thenReturn(Page.empty());
         when(strategyFactory.findStrategy(any()))
                 .thenReturn(new WaitingStateStrategy(bookingRepository));
