@@ -36,10 +36,10 @@ public class ItemRequestController {
 
     @GetMapping("/all")
     public ResponseEntity<Object> getAllRequests(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                                 @PositiveOrZero @RequestParam(name = "from", defaultValue = "0")
-                                                         Integer from,
-                                                 @Positive @RequestParam(name = "size", defaultValue = "10")
-                                                         Integer size) {
+                                                 @RequestParam(name = "from", defaultValue = "0")
+                                                 @PositiveOrZero Integer from,
+                                                 @RequestParam(name = "size", defaultValue = "10")
+                                                 @Positive Integer size) {
         return itemRequestClient.getAllRequests(userId, from, size);
     }
 
