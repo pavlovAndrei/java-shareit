@@ -2,6 +2,7 @@ package ru.practicum.shareit.request;
 
 import java.util.List;
 
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +19,7 @@ import ru.practicum.shareit.request.service.ItemRequestService;
 
 @RestController
 @RequiredArgsConstructor
+@Validated
 @RequestMapping("/requests")
 public class ItemRequestController {
 
