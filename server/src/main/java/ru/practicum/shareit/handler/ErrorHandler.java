@@ -20,12 +20,6 @@ public class ErrorHandler {
         return new ErrorResponse(e.getMessage());
     }
 
-//    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-//    @ExceptionHandler(ConstraintViolationException.class)
-//    public ErrorResponse handleBadRequestException(ConstraintViolationException e) {
-//        return new ErrorResponse(e.getMessage());
-//    }
-
     @Getter
     @RequiredArgsConstructor
     static class ErrorResponse {
