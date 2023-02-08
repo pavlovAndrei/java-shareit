@@ -19,7 +19,6 @@ import ru.practicum.shareit.request.service.ItemRequestService;
 
 @RestController
 @RequiredArgsConstructor
-@Validated
 @RequestMapping("/requests")
 public class ItemRequestController {
 

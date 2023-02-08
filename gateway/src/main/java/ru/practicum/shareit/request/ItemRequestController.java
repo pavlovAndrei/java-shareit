@@ -5,6 +5,7 @@ import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping(path = "/requests")
+@Validated
 @RequiredArgsConstructor
 public class ItemRequestController {
 
@@ -35,11 +37,11 @@ public class ItemRequestController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<Object> getAllRequests(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public ResponseEntity<Object> getAllRequests(@RequestHeader("X-Sharer-User-Id") long userId,
                                                  @RequestParam(name = "from", defaultValue = "0")
-                                                 @PositiveOrZero Integer from,
+                                                 @PositiveOrZero int from,
                                                  @RequestParam(name = "size", defaultValue = "10")
-                                                 @Positive Integer size) {
+                                                 @Positive int size) {
         return itemRequestClient.getAllRequests(userId, from, size);
     }
 
