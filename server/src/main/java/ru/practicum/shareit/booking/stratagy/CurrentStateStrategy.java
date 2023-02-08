@@ -14,8 +14,6 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.State;
 import ru.practicum.shareit.common.CustomPageRequest;
 
-import static ru.practicum.shareit.common.CustomPageRequest.of;
-
 @Component
 @AllArgsConstructor
 public class CurrentStateStrategy implements BookingStateFetchStrategy {
